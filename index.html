@@ -106,13 +106,48 @@ footer {
   مساحة سؤال | منصة تعليمية مستقلة
 </footer>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCVpCLPq-f3rILp-aCRBquRpAFehOFqsvI",
+  authDomain: "masahat-sual.firebaseapp.com",
+  projectId: "masahat-sual",
+  storageBucket: "masahat-sual.firebasestorage.app",
+  messagingSenderId: "58525032230",
+  appId: "1:58525032230:web:18e9dfa9568872d26f6be7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 document.getElementById("questionForm")
-.addEventListener("submit", function(event) {
-  event.preventDefault();
-  document.getElementById("message").textContent =
-    "هذه نسخة تجريبية. لم يتم إرسال السؤال.";
-});
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const course = document.getElementById("course").value.trim();
+    const question = document.getElementById("question").value.trim();
+    const message = document.getElementById("message");
+
+    if (!course || !question) return;
+
+    message.textContent = "جاري إرسال السؤال...";
+
+    try {
+      await addDoc(collection(db, "questions"), {
+        course: course,
+        question: question
+      });
+
+      message.textContent = "تم إرسال سؤالك بنجاح!";
+      event.target.reset();
+    } catch (error) {
+      message.textContent = "تعذر إرسال السؤال، حاولي مرة ثانية.";
+      console.error(error);
+    }
+  });
 </script>
-</body>
-</html>
+
+
+
