@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مساحة سؤال | صفحة الدكتور</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Tahoma, Arial, sans-serif;
+      background: #f3f6f9; color: #16344e;
+    }
+    header {
+      background: #004876; color: white;
+      text-align: center; padding: 30px 15px;
+      border-bottom: 5px solid #c19d60;
+    }
+    main {
+      max-width: 650px; margin: 35px auto;
+      background: white; padding: 25px;
+      border-radius: 20px;
+    }
+    input, button {
+      display: block; width: 100%; padding: 15px;
+      margin: 12px 0; border-radius: 10px;
+      font-size: 16px;
+    }
+    input { border: 1px solid #bccbd8; }
+    button {
+      background: #004876; color: white;
+      border: none; cursor: pointer;
+    }
+    .question {
+      padding: 15px; margin: 12px 0;
+      background: #f3f6f9; border-radius: 12px;
+      overflow-wrap: anywhere;
+    }
+    #dashboard, #logout { display: none; }
+    #message { color: #004876; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>مساحة سؤال</h1>
+    <p>لوحة الدكتور لعرض أسئلة الطلاب</p>
+  </header>
+
+  <main>
+    <section id="login">
+      <h2>دخول الدكتور</h2>
+      <form id="loginForm">
+        <input id="email" type="email"
+          placeholder="البريد الإلكتروني" required>
+        <input id="password" type="password"
+          placeholder="كلمة المرور" required>
+        <button type="submit">تسجيل الدخول</button>
+      </form>
+    </section>
+
+    <section id="dashboard">
+      <h2>أسئلة الطلاب</h2>
+      <div id="questions"></div>
+    </section>
+
+    <button id="logout">تسجيل الخروج</button>
+    <p id="message"></p>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import {
+      getAuth, signInWithEmailAndPassword,
+      onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import {
+      getFirestore, collection, getDocs
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVpCLPq-f3rILp-aCRBquRpAFehOFqsvI",
+      authDomain: "masahat-sual.firebaseapp.com",
+      projectId: "masahat-sual",
+      storageBucket: "masahat-sual.firebasestorage.app",
+      messagingSenderId: "58525032230",
+      appId: "1:58525032230:web:18e9dfa9568872d26f6be7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const doctorUID = "hoDofB7I05NIn37zCsZkN8NsQBw1";
+
+    const login = document.getElementById("login");
+    const dashboard = document.getElementById("dashboard");
+    const logout = document.getElementById("logout");
+    const message = document.getElementById("message");
+    const questions = document.getElementById("questions");
+
+    document.getElementById("loginForm")
+      .addEventListener("submit", async (event) => {
+        event.preventDefault();
+        message.textContent = "جاري تسجيل الدخول...";
+        try {
+          await signInWithEmailAndPassword(
+            auth,
+            document.getElementById("email").value.trim(),
+            document.getElementById("password").value
+          );
+        } catch (error) {
+          message.textContent = "تعذر تسجيل الدخول. تأكدي من البيانات.";
+        }
+      });
+
+    onAuthStateChanged(auth, async (user) => {
+      questions.replaceChildren();
+      const authorized = user && user.uid === doctorUID;
+
+      login.style.display = authorized ? "none" : "block";
+      dashboard.style.display = authorized ? "block" : "none";
+      logout.style.display = user ? "block" : "none";
+
+      if (!authorized) {
+        message.textContent = user
+          ? "هذا الحساب غير مصرح له بعرض الأسئلة."
+          : "";
+        return;
+      }
+
+      message.textContent = "جاري تحميل الأسئلة...";
+      try {
+        const snapshot = await getDocs(collection(db, "questions"));
+        message.textContent = "";
+        if (snapshot.empty) {
+          questions.textContent = "لا توجد أسئلة حالياً.";
+        }
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const card = document.createElement("div");
+          card.className = "question";
+          const title = document.createElement("strong");
+          title.textContent = data.course || "مقرر غير محدد";
+          const body = document.createElement("p");
+          body.textContent = data.question || "";
+          card.append(title, body);
+          questions.appendChild(card);
+        });
+      } catch (error) {
+        message.textContent = "تعذر تحميل الأسئلة.";
+      }
+    });
+
+    logout.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+  </script>
+</body>
+</html>
