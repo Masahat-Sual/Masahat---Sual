@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مساحة سؤال</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Tahoma, Arial, sans-serif;
+  background: #f3f6f9;
+  color: #16344e;
+}
+header {
+  background: #004876;
+  color: white;
+  padding: 45px 20px;
+  text-align: center;
+  border-bottom: 5px solid #c19d60;
+}
+h1 { font-size: 36px; margin: 0 0 12px; }
+header p { line-height: 1.9; }
+main {
+  max-width: 480px;
+  margin: 35px auto;
+  padding: 28px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 5px 25px #16344e12;
+}
+h2 { color: #004876; }
+label {
+  display: block;
+  margin-top: 18px;
+  font-weight: bold;
+}
+input, textarea {
+  width: 100%;
+  margin-top: 9px;
+  padding: 14px;
+  border: 1px solid #ccd6df;
+  border-radius: 9px;
+  font: inherit;
+}
+textarea { min-height: 140px; }
+button {
+  width: 100%;
+  margin-top: 22px;
+  padding: 15px;
+  background: #004876;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: bold;
+}
+.note {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.8;
+}
+#message { color: #004876; }
+footer {
+  text-align: center;
+  color: #64748b;
+  font-size: 12px;
+  padding: 25px;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>مساحة سؤال</h1>
+  <p>مساحتك لطرح الأسئلة بكل ثقة وخصوصية،
+  دون الكشف عن هويتك لأستاذ المقرر.</p>
+</header>
+
+<main>
+  <h2>اطرح سؤالك</h2>
+  <p class="note">
+    مساحة تعليمية تتيح للطلاب والطالبات
+    طرح الأسئلة أثناء المحاضرات.
+  </p>
+
+  <form id="questionForm">
+    <label for="course">اسم المقرر</label>
+    <input id="course" required
+      placeholder="أدخل اسم المقرر">
+
+    <label for="question">سؤالك</label>
+    <textarea id="question" required
+      placeholder="اكتب سؤالك هنا..."></textarea>
+
+    <button type="submit">إرسال السؤال</button>
+  </form>
+
+  <p id="message" role="status"></p>
+  <p class="note">
+    نسخة تجريبية: لا يتم إرسال الأسئلة حاليًا.
+  </p>
+</main>
+
+<footer>
+  مساحة سؤال | منصة تعليمية مستقلة
+</footer>
+
+<script>
+document.getElementById("questionForm")
+.addEventListener("submit", function(event) {
+  event.preventDefault();
+  document.getElementById("message").textContent =
+    "هذه نسخة تجريبية. لم يتم إرسال السؤال.";
+});
+</script>
+</body>
+</html>
